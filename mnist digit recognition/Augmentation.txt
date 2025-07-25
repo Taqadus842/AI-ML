@@ -1,0 +1,27 @@
+from scipy.ndimage import rotate
+
+def rotate_imgs(images, angle=15):
+    return np.array([
+        rotate(img.reshape(28, 28), angle, reshape=False, mode='nearest').flatten()
+        for img in images
+    ])
+
+# Augment training data
+X_aug1 = rotate_imgs(X_train[:60000], angle=15)
+X_aug2 = rotate_imgs(X_train[:60000], angle=-15)
+y_aug = y_train[:60000]
+
+X_aug = np.vstack((X_aug1, X_aug2))
+y_aug = np.hstack((y_aug, y_aug))  # duplicate labels
+
+# Combine with original training data
+X_combined = np.vstack((X_train, X_aug))
+y_combined = np.hstack((y_train, y_aug))
+
+# Train Random Forest
+rf_aug = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_aug.fit(X_combined, y_combined)
+
+# Evaluate
+accuracy = rf_aug.score(X_test, y_test)
+print("Improved Accuracy:", accuracy)

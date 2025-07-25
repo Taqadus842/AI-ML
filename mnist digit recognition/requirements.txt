@@ -1,0 +1,5 @@
+gradio
+scikit-learn==1.7.1
+joblib
+numpy
+pillow
