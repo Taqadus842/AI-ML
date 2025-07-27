@@ -13,15 +13,14 @@ import joblib
 import string
 import random
 
-# Load dataset
 dataset = load_dataset("Pradeep016/career-guidance-qa-dataset")
 df = dataset['train'].to_pandas()
 
-# Load model and vectorizer
+
 model = joblib.load('intent_model.pkl')
 vectorizer = joblib.load('vectorizer.pkl')
 
-# Text cleaning
+
 def clean_text(text):
     text = text.lower()
     text = text.translate(str.maketrans('', '', string.punctuation))
@@ -38,18 +37,18 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-# Chat input
+
 if user_query := st.chat_input("What's your interest or question?"):
     st.session_state.messages.append({"role": "user", "content": user_query})
     with st.chat_message("user"):
         st.markdown(user_query)
 
-    # Prediction
+
     cleaned = clean_text(user_query)
     vec = vectorizer.transform([cleaned])
     predicted_role = model.predict(vec)[0]
 
-    # Fetch answer
+
     answers = df[df['role'] == predicted_role]['answer'].tolist()
     selected_answer = random.choice(answers) if answers else "No answer found."
 
@@ -58,7 +57,7 @@ if user_query := st.chat_input("What's your interest or question?"):
     with st.chat_message("assistant"):
         st.markdown(bot_msg)
 
-# Sidebar manual role selector
+
 st.sidebar.title("🔍 Explore Careers")
 role = st.sidebar.selectbox("Select a career field", sorted(df['role'].unique()))
 
